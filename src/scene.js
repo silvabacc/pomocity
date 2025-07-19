@@ -12,10 +12,76 @@ export function createScene() {
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
   gameWindow.append(renderer.domElement);
 
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  //Mesh - it is data about the structure of a model, how the object should actually be rendered
+  let terrain = [];
+  let buildings = [];
+
+  function initialize(city) {
+    scene.clear();
+    terrain = [];
+    buildings = [];
+
+    for (let x = 0; x < city.size; x++) {
+      const column = [];
+      for (let y = 0; y < city.size; y++) {
+        //The 0.5 actually places the object in a position. 0.5 means on top of plane
+        // -0.5 is the plane itself
+
+        // Grass geomtry
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(x, -0.5, y);
+        scene.add(mesh);
+        column.push(mesh);
+      }
+      terrain.push(column);
+      buildings.push([...Array(city.size)]);
+    }
+
+    setupLights();
+  }
+
+  function update(city) {
+    for (let x = 0; x < city.size; x++) {
+      for (let y = 0; y < city.size; y++) {
+        // Building geomtry
+        const tile = city.data[x][y];
+        if (tile.building && tile.building.startsWith("building")) {
+          const height = Number(tile.building.slice(-1));
+          const buildingGeometry = new THREE.BoxGeometry(1, height, 1);
+          const buildingMaterial = new THREE.MeshLambertMaterial({
+            color: 0x77777777,
+          });
+          const buildingMesh = new THREE.Mesh(
+            buildingGeometry,
+            buildingMaterial
+          );
+          buildingMesh.position.set(x, height / 2, y);
+          if (buildings[x][y]) {
+            scene.remove(buildings[x][y]);
+          }
+          scene.add(buildingMesh);
+          buildings[x][y] = buildingMesh;
+        }
+      }
+    }
+  }
+
+  function setupLights() {
+    const lights = [
+      new THREE.AmbientLight(0xffffffff, 0.2),
+      new THREE.DirectionalLight(0xffffffff, 0.3),
+      new THREE.DirectionalLight(0xffffffff, 0.3),
+      new THREE.DirectionalLight(0xffffffff, 0.3),
+    ];
+
+    lights[1].position.set(0, 1, 0);
+    lights[2].position.set(1, 1, 0);
+    lights[3].position.set(0, 1, 1);
+
+    scene.add(...lights);
+  }
 
   function draw() {
     renderer.render(scene, camera.camera);
@@ -42,6 +108,8 @@ export function createScene() {
   }
 
   return {
+    initialize,
+    update,
     start,
     stop,
     onMouseDown,

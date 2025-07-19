@@ -11,11 +11,6 @@ export function createCamera(gameWindow) {
   const Y_AXIS = new THREE.Vector3(0, 1, 0);
   const DEG2RAD = Math.PI / 180;
 
-  let cameraOrigin = new THREE.Vector3();
-  let cameraRadius = 4;
-  let cameraAzimuth = 0;
-  let cameraElevation = 0;
-
   const LEFT_MOUSE_BUTTON = 0;
   const MIDDLE_MOUSE_BUTTON = 1;
   const RIGHT_MOUSE_BUTTON = 2;
@@ -24,11 +19,16 @@ export function createCamera(gameWindow) {
   const SENSTIVITY_ZOOM = 0.02;
   const PAN_SENSTIVITY = -0.01;
 
-  const MAX_CAMERA_RADIUS = 10;
-  const MIN_CAMERA_RADIUS = 2;
+  const MIN_CAMERA_RADIUS = 10;
+  const MAX_CAMERA_RADIUS = 20;
 
   const MIN_CAMERA_ELEVATION = 30;
   const MAX_CAMERA_ELEVATION = 90;
+
+  let cameraOrigin = new THREE.Vector3();
+  let cameraRadius = 20;
+  let cameraAzimuth = 135;
+  let cameraElevation = 45;
 
   let isLeftMouseDown = false;
   let isRightMouseDown = false;
@@ -88,6 +88,7 @@ export function createCamera(gameWindow) {
         MAX_CAMERA_RADIUS,
         Math.max(MIN_CAMERA_RADIUS, cameraRadius)
       );
+      console.log(cameraRadius);
       updateCameraPosition();
     }
 
