@@ -16,6 +16,8 @@ const assets = {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = {
       id: "grass",
+      x,
+      y,
     };
     mesh.position.set(x, -0.5, y);
     return mesh;
@@ -28,6 +30,8 @@ const assets = {
     const buildingMesh = new THREE.Mesh(geometry, buildingMaterial);
     buildingMesh.userData = {
       id: "building-1",
+      x,
+      y,
     };
     buildingMesh.position.set(x, 0.5 / 2, y);
     return buildingMesh;
@@ -39,6 +43,8 @@ const assets = {
     const buildingMesh = new THREE.Mesh(geometry, buildingMaterial);
     buildingMesh.userData = {
       id: "building-2",
+      x,
+      y,
     };
     //We scale it to increase the height of the building
     buildingMesh.scale.set(1, 2, 1);
@@ -52,6 +58,8 @@ const assets = {
     const buildingMesh = new THREE.Mesh(geometry, buildingMaterial);
     buildingMesh.userData = {
       id: "building-3",
+      x,
+      y,
     };
     buildingMesh.scale.set(1, 3, 1);
     buildingMesh.position.set(x, 1.5 / 2, y);
