@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createCamera } from "./camera.js";
+import { createAssetInstnace } from "./assets.js";
 
 export function createScene() {
   const gameWindow = document.getElementById("render-target");
@@ -24,14 +25,8 @@ export function createScene() {
     for (let x = 0; x < city.size; x++) {
       const column = [];
       for (let y = 0; y < city.size; y++) {
-        //The 0.5 actually places the object in a position. 0.5 means on top of plane
-        // -0.5 is the plane itself
-
-        // Grass geomtry
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(x, -0.5, y);
+        const terrainId = city.data[x][y].terrainId;
+        const mesh = createAssetInstnace(terrainId, x, y);
         scene.add(mesh);
         column.push(mesh);
       }
@@ -45,24 +40,20 @@ export function createScene() {
   function update(city) {
     for (let x = 0; x < city.size; x++) {
       for (let y = 0; y < city.size; y++) {
-        // Building geomtry
-        const tile = city.data[x][y];
-        if (tile.building && tile.building.startsWith("building")) {
-          const height = Number(tile.building.slice(-1));
-          const buildingGeometry = new THREE.BoxGeometry(1, height, 1);
-          const buildingMaterial = new THREE.MeshLambertMaterial({
-            color: 0x77777777,
-          });
-          const buildingMesh = new THREE.Mesh(
-            buildingGeometry,
-            buildingMaterial
-          );
-          buildingMesh.position.set(x, height / 2, y);
-          if (buildings[x][y]) {
-            scene.remove(buildings[x][y]);
-          }
-          scene.add(buildingMesh);
-          buildings[x][y] = buildingMesh;
+        const currentBuildingId = buildings[x][y]?.userData.id;
+        const newBuildingId = city.data[x][y].buildingId;
+
+        // If player removes a building, remove from scene
+        if (!newBuildingId && currentBuildingId) {
+          scene.remove(building[x][y]);
+          buildings[x][y] = undefined;
+        }
+
+        // If data model has changed, update the mesh
+        if (newBuildingId !== currentBuildingId) {
+          scene.remove(buildings[x][y]);
+          buildings[x][y] = createAssetInstnace(newBuildingId, x, y);
+          scene.add(buildings[x][y]);
         }
       }
     }
